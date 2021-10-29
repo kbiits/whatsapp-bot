@@ -1,0 +1,10 @@
+{
+  "name": "infixion-bot-sync",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@adiwajshing/baileys": "^3.5.2",
+    "agenda": "^4.2.1"
+  }
+}
