@@ -1,1 +1,1 @@
-{"version":3,"file":"commands.js","sourceRoot":"","sources":["../../../src/constants/commands.ts"],"names":[],"mappings":";;;AAAA,yCAA6C;AAC7C,iEAAgE;AAGnD,QAAA,QAAQ,GAAe;IAClC,IAAI,EAAE,gBAAS;IACf,6BAA6B,EAAE,yBAAW;CAC3C,CAAC"}
+{"version":3,"file":"commands.js","sourceRoot":"","sources":["../../../src/constants/commands.ts"],"names":[],"mappings":";;;AAAA,yCAA6C;AAC7C,iEAAgE;AAGnD,QAAA,QAAQ,GAAe;IAClC,IAAI,EAAE,gBAAS;IACf,sCAAsC,EAAE,yBAAW;CACpD,CAAC"}

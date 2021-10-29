@@ -48,7 +48,6 @@ exports.default = (function (agenda) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    console.log('reminder send');
                     console.log('job :');
                     console.log(job);
                     _a.label = 1;

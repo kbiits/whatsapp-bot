@@ -4,5 +4,5 @@ import { CommandMap } from '../types/type';
 
 export const commands: CommandMap = {
   help: helpReply,
-  'reminders_add_(.+)_msg_(.+)': reminderAdd,
+  'reminders_add_for_time_(.+)_msg_(.+)': reminderAdd,
 };

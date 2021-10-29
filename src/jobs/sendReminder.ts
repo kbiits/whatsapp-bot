@@ -9,7 +9,6 @@ export default (agenda: Agenda) => {
     agendaConstDefinition.send_reminder,
     { concurrency: 3, priority: 10 },
     async (job: Job) => {
-      console.log('reminder send');
       console.log('job :');
       console.log(job);
       try {

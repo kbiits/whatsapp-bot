@@ -5,6 +5,10 @@
   "license": "MIT",
   "dependencies": {
     "@adiwajshing/baileys": "^3.5.2",
-    "agenda": "^4.2.1"
+    "agenda": "^4.2.1",
+    "human-interval": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/human-interval": "^1.0.0"
   }
 }
