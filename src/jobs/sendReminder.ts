@@ -5,27 +5,24 @@ import { ReminderScheduleData } from '../types/type';
 import sock from './../socketConnection';
 
 export default (agenda: Agenda) => {
-  agenda.define(
-    agendaConstDefinition.send_reminder,
-    { concurrency: 3, priority: 10 },
-    async (job: Job) => {
-      console.log('job :');
-      console.log(job);
-      try {
-        const data: ReminderScheduleData = job.attrs
-          .data! as ReminderScheduleData;
-        await sock.sendMessage(
-          job.attrs!.data!.jid!,
-          data.msg,
-          MessageType.text,
-        );
-      } catch (err) {
-        console.log(
-          'Failed to run job, attrs.data type is not ReminderScheduleData, err :',
-        );
-        console.log(err);
+  agenda.define(agendaConstDefinition.send_reminder, { concurrency: 3, priority: 10 }, async (job: Job) => {
+    try {
+      const data: ReminderScheduleData = job.attrs.data! as ReminderScheduleData;
+      if (data.jid.indexOf('@g.us') === -1) {
+        await sock.sendMessage(job.attrs!.data!.jid!, data.msg, MessageType.text);
         return;
       }
-    },
-  );
+      const participants = (await sock.groupMetadata(data.jid)).participants;
+      const participantsJids = participants.map((p) => p.jid);
+      await sock.sendMessage(job.attrs!.data!.jid!, data.msg, MessageType.extendedText, {
+        contextInfo: {
+          mentionedJid: participantsJids,
+        },
+      });
+    } catch (err) {
+      console.log('Failed to run job, err :');
+      console.log(err);
+      return;
+    }
+  });
 };

@@ -1,13 +1,13 @@
 import { MessageType, proto, WAMessage } from '@adiwajshing/baileys';
 import { Job, JobAttributesData } from 'agenda';
+import agenda from '../../agendas';
 import { agendaConstDefinition } from '../../constants/agenda';
 import { ReminderScheduleData, ResolverFunctionCarry, ResolverResult } from '../../types/type';
-import agenda from '../../worker';
-import humanInterval from 'human-interval';
+import worker from '../../worker';
 
-const sendBlockedRepeatInterval = (message: WAMessage): ResolverResult => {
+const sendBlockedRepeatInterval = (message: WAMessage, jid: string): ResolverResult => {
   return {
-    destinationId: message.key.remoteJid,
+    destinationId: jid,
     message: 'Maaf ya, gak bisa seconds ataupun minutes, ni server overload lu mau ganti hah ?',
     type: MessageType.text,
     options: {
@@ -16,25 +16,28 @@ const sendBlockedRepeatInterval = (message: WAMessage): ResolverResult => {
   };
 };
 
-export const reminderAdd: ResolverFunctionCarry =
+export const addReminder: ResolverFunctionCarry =
   (matches: RegExpMatchArray) =>
-  (message: proto.WebMessageInfo): ResolverResult => {
+  (message: proto.WebMessageInfo, jid: string): ResolverResult => {
     try {
       const cleanRepeatAt = matches[1].replace(/_/g, ' ');
       const cleanMsg = matches[2].replace(/_/g, ' ');
 
       if (cleanRepeatAt.match(/second?s|minute?s/)) {
-        return sendBlockedRepeatInterval(message);
+        return sendBlockedRepeatInterval(message, jid);
       }
 
       const schedule: ReminderScheduleData = {
-        jid: message.key.remoteJid,
+        jid,
         msg: cleanMsg,
       };
+      if (cleanRepeatAt.indexOf('repeat') !== -1) {
+        agenda.schedule(cleanRepeatAt, agendaConstDefinition.send_reminder, schedule);
+        return;
+      }
 
-      const job: Job<JobAttributesData> = agenda.create(agendaConstDefinition.send_reminder, schedule);
+      const job: Job<JobAttributesData> = worker.create(agendaConstDefinition.send_reminder, schedule);
       job.schedule(cleanRepeatAt);
-      job.repeatAt(cleanRepeatAt);
       job.save();
     } catch (err) {
       console.log('error');

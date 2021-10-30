@@ -1,22 +1,12 @@
-import {
-  MessageOptions,
-  MessageType,
-  proto,
-  WALocationMessage,
-  WAMediaUpload,
-} from '@adiwajshing/baileys';
+import { MessageOptions, MessageType, proto, WALocationMessage, WAMediaUpload } from '@adiwajshing/baileys';
 
 export interface CommandMap {
   [key: string]: ResolverFunctionCarry;
 }
 
-export type ResolverFunction = (
-  message: proto.WebMessageInfo,
-) => ResolverResult;
+export type ResolverFunction = (message: proto.WebMessageInfo, jid: string) => Promise<ResolverResult> | ResolverResult;
 
-export type ResolverFunctionCarry = (
-  matches: RegExpMatchArray,
-) => ResolverFunction;
+export type ResolverFunctionCarry = (matches: RegExpMatchArray) => ResolverFunction;
 
 export interface ResolverResult {
   destinationId: string;
