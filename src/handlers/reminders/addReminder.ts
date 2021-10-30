@@ -33,12 +33,11 @@ export const addReminder: ResolverFunctionCarry =
       };
       if (cleanRepeatAt.indexOf('repeat') !== -1) {
         agenda.schedule(cleanRepeatAt, agendaConstDefinition.send_reminder, schedule);
-        return;
+      } else {
+        const job: Job<JobAttributesData> = worker.create(agendaConstDefinition.send_reminder, schedule);
+        job.schedule(cleanRepeatAt);
+        job.save();
       }
-
-      const job: Job<JobAttributesData> = worker.create(agendaConstDefinition.send_reminder, schedule);
-      job.schedule(cleanRepeatAt);
-      job.save();
     } catch (err) {
       console.log('error');
       console.log(err);
