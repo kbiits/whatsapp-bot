@@ -11,3 +11,4 @@ Lightweight Whatsapp bot for reminders based on baileys
 | Help | ✔️ |
 | Voting | :x: |
 | Tag everyone | ✔️ |
+| Image to Sticker | ✔️ |
