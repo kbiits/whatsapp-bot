@@ -1,3 +1,3 @@
 export default (chatText: String): Boolean => {
-  return chatText.startsWith('/bot');
+  return chatText.startsWith('/pe');
 };
