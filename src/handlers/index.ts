@@ -1,7 +1,6 @@
-import { MessageType, WAChatUpdate, WAConnection, WA_MESSAGE_STUB_TYPE } from '@adiwajshing/baileys';
+import { MessageType, WAChatUpdate, WAConnection } from '@adiwajshing/baileys';
 import { ResolverResult } from '../types/type';
-import checkCommand from '../utils/checkCommand';
-import { rootMessage } from '../utils/replyMessage';
+import checkPrefix from '../utils/checkPrefix';
 import { getResolver } from '../utils/resolver';
 
 export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
@@ -12,11 +11,20 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
 
   chat.messages?.all()?.forEach(async (message) => {
     if (message.key?.fromMe ?? true) return;
+    let text = '';
 
-    if (!checkCommand(message.message?.conversation.trim() ?? '')) {
-      if (chat.jid.match(/@g\.us$/) && message.message?.conversation?.indexOf('@everyone') !== -1) {
-        const participants = (await conn.groupMetadata(chat.jid)).participants;
-        const participantsJids = participants.map((p) => p.jid);
+    const messageType = Object.keys(message.message)[0];
+    if (messageType === MessageType.text) {
+      text = message.message?.conversation?.trim() ?? '';
+    } else if (messageType === MessageType.extendedText) {
+      text = message.message.extendedTextMessage.text;
+    } else if (messageType === MessageType.image) {
+      text = message.message.imageMessage.caption;
+    }
+
+    if (!checkPrefix(text)) {
+      if (chat.jid.match(/@g\.us$/) && text.indexOf('@everyone') !== -1) {
+        const participantsJids = chat.metadata?.participants.map((p) => p.jid) ?? [];
 
         await conn.sendMessage(chat.jid, '.', MessageType.extendedText, {
           quoted: message,
@@ -29,23 +37,29 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
       return;
     }
 
-    const chatTextArr = message.message.conversation.trim().split(' ');
+    const chatTextArr = text.split(/ +/);
 
     // if there's no command specified
     if (chatTextArr.length === 1) {
-      conn.sendMessage(chat.jid, rootMessage(message.participant), MessageType.extendedText, {
-        contextInfo: {
-          mentionedJid: [message.participant],
-        },
-      });
+      conn.sendMessage(
+        chat.jid,
+        `Halo, ${chat.jid.endsWith('@g.us') ? `@${message.participant.split('@')[0]}` : 'ada apa ?'}`,
+        MessageType.extendedText,
+        {
+          contextInfo: {
+            mentionedJid: [message.participant],
+          },
+        }
+      );
       return;
     }
 
-    const intents = chatTextArr.slice(1);
-    const resolver = getResolver(intents);
+    chatTextArr.shift();
+    const resolver = getResolver(chatTextArr);
 
     const sendMessage: ResolverResult = await resolver(message, chat.jid);
 
+    if (!sendMessage || !sendMessage.destinationId || !sendMessage.message || !sendMessage.type) return;
     conn.sendMessage(sendMessage.destinationId, sendMessage.message, sendMessage.type, sendMessage.options);
   });
 };
