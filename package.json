@@ -6,6 +6,7 @@
   "dependencies": {
     "@adiwajshing/baileys": "^3.5.2",
     "agenda": "^4.2.1",
+    "date.js": "^0.3.3",
     "sharp": "^0.29.2"
   },
   "devDependencies": {

@@ -10,6 +10,8 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
   conn.chatRead(chat.jid, 'read');
 
   chat.messages?.all()?.forEach(async (message) => {
+    // if it is not a regular text or media message
+    if (!message.message) return;
     if (message.key?.fromMe ?? true) return;
     let text = '';
 
@@ -24,8 +26,7 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
 
     if (!checkPrefix(text)) {
       if (chat.jid.match(/@g\.us$/) && text.indexOf('@everyone') !== -1) {
-        const participantsJids = chat.metadata?.participants.map((p) => p.jid) ?? [];
-
+        const participantsJids = (await conn.groupMetadata(chat.jid)).participants.map((p) => p.jid) ?? [];
         await conn.sendMessage(chat.jid, '.', MessageType.extendedText, {
           quoted: message,
           contextInfo: {

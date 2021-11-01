@@ -4,6 +4,7 @@ import agenda from '../../agendas';
 import { agendaConstDefinition } from '../../constants/agenda';
 import { ReminderScheduleData, ResolverFunctionCarry, ResolverResult } from '../../types/type';
 import worker from '../../worker';
+import date from 'date.js/';
 
 const sendBlockedRepeatInterval = (message: WAMessage, jid: string): ResolverResult => {
   return {
@@ -31,11 +32,14 @@ export const addReminder: ResolverFunctionCarry =
         jid,
         msg: cleanMsg,
       };
-      if (cleanRepeatAt.indexOf('repeat') !== -1) {
+
+      if (cleanRepeatAt.indexOf('repeat') === -1) {
         agenda.schedule(cleanRepeatAt, agendaConstDefinition.send_reminder, schedule);
       } else {
         const job: Job<JobAttributesData> = worker.create(agendaConstDefinition.send_reminder, schedule);
-        job.schedule(cleanRepeatAt);
+        const time = cleanRepeatAt.replace('repeat', '').trim();
+        job.schedule(time);
+        job.repeatAt(time);
         job.save();
       }
     } catch (err) {

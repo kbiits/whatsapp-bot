@@ -9,12 +9,19 @@ export default (agenda: Agenda) => {
     try {
       const data: ReminderScheduleData = job.attrs.data! as ReminderScheduleData;
       if (data.jid.indexOf('@g.us') === -1) {
-        await sock.sendMessage(job.attrs!.data!.jid!, data.msg, MessageType.text);
+        await sock.sendMessage(data.jid, data.msg, MessageType.text);
         return;
       }
+
+      if (data.msg.indexOf('@everyone') === -1) {
+        await sock.sendMessage(data.jid, data.msg, MessageType.text);
+        return;
+      }
+
       const participants = (await sock.groupMetadata(data.jid)).participants;
       const participantsJids = participants.map((p) => p.jid);
-      await sock.sendMessage(job.attrs!.data!.jid!, data.msg, MessageType.extendedText, {
+
+      await sock.sendMessage(data.jid, data.msg, MessageType.extendedText, {
         contextInfo: {
           mentionedJid: participantsJids,
         },

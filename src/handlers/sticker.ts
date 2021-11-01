@@ -1,25 +1,38 @@
-import { MessageType, Mimetype, proto } from '@adiwajshing/baileys';
+import { decryptMediaMessageBuffer, MessageType, Mimetype, proto } from '@adiwajshing/baileys';
 import sharp from 'sharp';
 import conn from '../socketConnection';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../types/type';
+import { downloadMediaIMessageBuffer } from '../utils/downloadMedia';
 
 const allowedMimetype = [Mimetype.gif, Mimetype.jpeg, Mimetype.png];
 
 export const convertToSticker: ResolverFunctionCarry =
   (): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
+    let imageMessage: Buffer;
+    let mimeType: Mimetype;
     if (!message.message?.imageMessage) {
-      return {
-        destinationId: jid,
-        message: 'Please include the media when sending the command',
-        type: MessageType.text,
-        options: {
-          quoted: message,
-        },
-      };
+      const tempImage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage ?? null;
+      if (!tempImage ?? true)
+        return {
+          destinationId: jid,
+          message: 'Please include the media when sending the command',
+          type: MessageType.text,
+          options: {
+            quoted: message,
+          },
+        };
+      else {
+        imageMessage = (await downloadMediaIMessageBuffer(
+          message.message.extendedTextMessage.contextInfo.quotedMessage,
+          'buffer'
+        )) as Buffer;
+        mimeType = tempImage.mimetype as Mimetype;
+      }
     }
-    const mimeType = message.message.imageMessage.mimetype;
-    if (!allowedMimetype.includes(mimeType as Mimetype)) {
+
+    if (!mimeType) mimeType = message.message.imageMessage.mimetype as Mimetype;
+    if (!allowedMimetype.includes(mimeType)) {
       return {
         destinationId: jid,
         message: 'Not allowed mimetype',
@@ -31,10 +44,9 @@ export const convertToSticker: ResolverFunctionCarry =
     }
 
     conn.sendMessage(jid, 'Wait a minute', MessageType.text);
-    message.message.imageMessage.fileLength;
-    const image = await conn.downloadMediaMessage(message);
+    if (!imageMessage) imageMessage = await conn.downloadMediaMessage(message);
     try {
-      const bufferWebp = await sharp(image, {
+      const bufferWebp = await sharp(imageMessage, {
         failOnError: true,
       })
         .resize(512, 512)
