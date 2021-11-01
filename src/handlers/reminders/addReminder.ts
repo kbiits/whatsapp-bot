@@ -4,7 +4,6 @@ import agenda from '../../agendas';
 import { agendaConstDefinition } from '../../constants/agenda';
 import { ReminderScheduleData, ResolverFunctionCarry, ResolverResult } from '../../types/type';
 import worker from '../../worker';
-import date from 'date.js/';
 
 const sendBlockedRepeatInterval = (message: WAMessage, jid: string): ResolverResult => {
   return {

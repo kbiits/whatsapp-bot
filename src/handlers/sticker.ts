@@ -1,4 +1,4 @@
-import { decryptMediaMessageBuffer, MessageType, Mimetype, proto } from '@adiwajshing/baileys';
+import { MessageType, Mimetype, proto } from '@adiwajshing/baileys';
 import sharp from 'sharp';
 import conn from '../socketConnection';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../types/type';
