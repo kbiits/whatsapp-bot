@@ -7,7 +7,8 @@ export const getResolver = (intents: Array<string>): ResolverFunction => {
   let regexResult: RegExpMatchArray = null;
 
   for (const key of Object.keys(commands)) {
-    regexResult = string.match(key);
+    const regex = new RegExp(key, 'i');
+    regexResult = string.match(regex);
     if (regexResult) {
       return commands[key](regexResult);
     }

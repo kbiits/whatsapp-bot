@@ -1,6 +1,5 @@
 import { MessageType, proto, WAMessage } from '@adiwajshing/baileys';
 import { Job, JobAttributesData } from 'agenda';
-import agenda from '../../agendas';
 import { agendaConstDefinition } from '../../constants/agenda';
 import { ReminderScheduleData, ResolverFunctionCarry, ResolverResult } from '../../types/type';
 import worker from '../../worker';
@@ -23,19 +22,19 @@ export const addReminder: ResolverFunctionCarry =
       const cleanRepeatAt = matches[1].replace(/_/g, ' ');
       const cleanMsg = matches[2].replace(/_/g, ' ');
 
-      if (cleanRepeatAt.match(/second?s|minute?s/)) {
+      if (cleanRepeatAt.match(/seconds?|minutes?/)) {
         return sendBlockedRepeatInterval(message, jid);
       }
 
-      const schedule: ReminderScheduleData = {
+      const scheduleData: ReminderScheduleData = {
         jid,
         msg: cleanMsg,
       };
 
       if (cleanRepeatAt.indexOf('repeat') === -1) {
-        agenda.schedule(cleanRepeatAt, agendaConstDefinition.send_reminder, schedule);
+        worker.schedule(cleanRepeatAt, agendaConstDefinition.send_reminder, scheduleData);
       } else {
-        const job: Job<JobAttributesData> = worker.create(agendaConstDefinition.send_reminder, schedule);
+        const job: Job<JobAttributesData> = worker.create(agendaConstDefinition.send_reminder, scheduleData);
         const time = cleanRepeatAt.replace('repeat', '').trim();
         job.schedule(time);
         job.repeatAt(time);

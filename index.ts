@@ -1,3 +1,4 @@
 import conn from './src/socketConnection';
-
-conn.connect();
+(async () => {
+  await conn.connect();
+})().catch((err) => console.log('encountered error : ', err));

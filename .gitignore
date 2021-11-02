@@ -2,4 +2,5 @@ auth_info.json
 node_modules
 dist
 *.tar.gz
+*.log
 
