@@ -2,11 +2,12 @@ import { MessageType, proto } from '@adiwajshing/baileys';
 import axios from 'axios';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../types/type';
 
-export const badQuotes: ResolverFunctionCarry =
+export const randomQuote: ResolverFunctionCarry =
   (): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
-    const { data } = await axios.get('https://breaking-bad-quotes.herokuapp.com/v1/quotes'); // get random bad quotes
-    if (!Array.isArray(data) || !data.length) {
+    const { data } = await axios.get('https://api.quotable.io/random');
+
+    if (!data) {
       return {
         destinationId: jid,
         message: `Sorry, I don't have any quotes for you now`,
@@ -16,12 +17,12 @@ export const badQuotes: ResolverFunctionCarry =
         },
       };
     }
-    const quote = data[0];
-    const sendMessage = `${quote.quote}\n\n-- ${quote.author} --`;
+
+    const msg = `${data.content}\n\n-- ${data.author} --`;
 
     return {
       destinationId: jid,
-      message: sendMessage,
+      message: msg,
       type: MessageType.text,
       options: {
         quoted: message,

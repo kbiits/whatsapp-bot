@@ -6,12 +6,13 @@ import worker from './../../worker';
 export const getReminders: ResolverFunctionCarry =
   (matches: RegExpMatchArray): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
-    const queryJid =
-      jid.indexOf('@g.us') === -1
-        ? jid
-        : {
-            $regex: `${jid.replace(/^\d*-/, '')}$`,
-          };
+    // const queryJid =
+    //   jid.indexOf('@g.us') === -1
+    //     ? jid
+    //     : {
+    //         $regex: `${jid.replace(/^\d*-/, '')}$`,
+    //       };
+    const queryJid = jid;
     let query = {};
     if (!matches[1])
       query = {
@@ -56,7 +57,7 @@ export const getReminders: ResolverFunctionCarry =
     jobs.forEach((job, i) => {
       sendMessage += `\n${i + 1}. Message : ${job.attrs?.data?.msg ?? '(Tidak ada message)'}\n    Next Run At : ${
         job.attrs.nextRunAt?.toLocaleString('id-ID', formatDateOption) ?? '(Nothing)'
-      }${job.attrs.repeatAt && `\n    Repeat at : ${job.attrs.repeatAt}`}`;
+      }${job.attrs.repeatAt ? `\n    Repeat at : ${job.attrs.repeatAt}` : ''}`;
     });
 
     return {

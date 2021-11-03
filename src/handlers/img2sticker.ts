@@ -9,11 +9,12 @@ const allowedMimetype = [Mimetype.gif, Mimetype.jpeg, Mimetype.png];
 export const convertToSticker: ResolverFunctionCarry =
   (): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
-    let imageMessage: Buffer;
-    let mimeType: Mimetype;
-    if (!message.message?.imageMessage) {
-      const tempImage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage ?? null;
-      if (!tempImage ?? true)
+    let tempMessage: proto.IMessage = message.message;
+
+    if (!tempMessage.imageMessage) {
+      tempMessage = tempMessage?.extendedTextMessage?.contextInfo?.quotedMessage ?? null;
+      // const tempImage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage ?? null;
+      if (!tempMessage.imageMessage ?? true)
         return {
           destinationId: jid,
           message: 'Please include the media when sending the command',
@@ -22,14 +23,21 @@ export const convertToSticker: ResolverFunctionCarry =
             quoted: message,
           },
         };
-      else {
-        imageMessage = (await downloadMediaIMessageBuffer(
-          message.message.extendedTextMessage.contextInfo.quotedMessage,
-          'buffer'
-        )) as Buffer;
-        mimeType = tempImage.mimetype as Mimetype;
-      }
     }
+
+    if (tempMessage.imageMessage.fileLength > 1000 * 4) {
+      return {
+        destinationId: jid,
+        message: `Cannot convert image with size greater than 4_000_000 bytes`,
+        type: MessageType.text,
+        options: {
+          quoted: message,
+        },
+      };
+    }
+
+    const imageMessage: Buffer = (await downloadMediaIMessageBuffer(tempMessage)) as Buffer;
+    let mimeType: Mimetype = tempMessage.imageMessage.mimetype as Mimetype;
 
     if (!mimeType) mimeType = message.message.imageMessage.mimetype as Mimetype;
     if (!allowedMimetype.includes(mimeType)) {
@@ -44,12 +52,13 @@ export const convertToSticker: ResolverFunctionCarry =
     }
 
     conn.sendMessage(jid, 'Wait a minute', MessageType.text);
-    if (!imageMessage) imageMessage = await conn.downloadMediaMessage(message);
     try {
       const bufferWebp = await sharp(imageMessage, {
         failOnError: true,
       })
-        .resize(512, 512)
+        .resize(512, 512, {
+          fit: 'cover',
+        })
         .webp()
         .toBuffer();
       conn.sendMessage(jid, bufferWebp, MessageType.sticker, {

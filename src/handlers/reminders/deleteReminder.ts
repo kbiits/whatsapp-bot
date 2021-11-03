@@ -6,23 +6,17 @@ import worker from '../../worker';
 export const deleteReminder: ResolverFunctionCarry =
   (matches: RegExpMatchArray): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
-    const queryJid =
-      jid.indexOf('@g.us') === -1
-        ? jid
-        : {
-            $regex: `${jid.replace(/^\d*-/, '')}$`,
-          };
     let query = {};
     if (!matches[1])
       query = {
         name: agendaConstDefinition.send_reminder,
-        'data.jid': queryJid,
+        'data.jid': jid,
         nextRunAt: { $exists: true, $ne: null, $gte: new Date(Date.now()) },
       };
     else
       query = {
         name: agendaConstDefinition.send_reminder,
-        'data.jid': queryJid,
+        'data.jid': jid,
       };
     const jobs = await worker.jobs(query, {
       _id: 1,

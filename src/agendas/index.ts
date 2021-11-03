@@ -4,7 +4,7 @@ import sendReminder from '../jobs/sendReminder';
 
 const agenda = new Agenda({
   db: { address: mongoConnectionString },
-}).processEvery('five minutes');
+}).processEvery('4 minutes');
 
 sendReminder(agenda);
 

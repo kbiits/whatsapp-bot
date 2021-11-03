@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import conn from './src/socketConnection';
 (async () => {
   await conn.connect();

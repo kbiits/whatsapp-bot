@@ -1,4 +1,4 @@
-import { MessageType } from '@adiwajshing/baileys';
+import { isGroupID, MessageType } from '@adiwajshing/baileys';
 import Agenda, { Job } from 'agenda';
 import { agendaConstDefinition } from '../constants/agenda';
 import { ReminderScheduleData } from '../types/type';
@@ -8,7 +8,7 @@ export default (agenda: Agenda) => {
   agenda.define(agendaConstDefinition.send_reminder, { concurrency: 3, priority: 10 }, async (job: Job) => {
     try {
       const data: ReminderScheduleData = job.attrs.data! as ReminderScheduleData;
-      if (data.jid.indexOf('@g.us') === -1) {
+      if (!isGroupID(data.jid)) {
         await sock.sendMessage(data.jid, data.msg, MessageType.text);
         return;
       }

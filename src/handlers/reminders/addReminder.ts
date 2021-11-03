@@ -1,5 +1,6 @@
 import { MessageType, proto, WAMessage } from '@adiwajshing/baileys';
 import { Job, JobAttributesData } from 'agenda';
+import dateJs from 'date.js/dist/date';
 import { agendaConstDefinition } from '../../constants/agenda';
 import { ReminderScheduleData, ResolverFunctionCarry, ResolverResult } from '../../types/type';
 import worker from '../../worker';
@@ -15,11 +16,12 @@ const sendBlockedRepeatInterval = (message: WAMessage, jid: string): ResolverRes
   };
 };
 
-export const addReminder: ResolverFunctionCarry =
+export const addReminderInterval: ResolverFunctionCarry =
   (matches: RegExpMatchArray) =>
   (message: proto.WebMessageInfo, jid: string): ResolverResult => {
+    const mentionedJids = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
     try {
-      const cleanRepeatAt = matches[1].replace(/_/g, ' ');
+      const cleanRepeatAt = matches[1].replace(/_|repeat/g, ' ').trim();
       const cleanMsg = matches[2].replace(/_/g, ' ');
 
       if (cleanRepeatAt.match(/seconds?|minutes?/)) {
@@ -30,14 +32,44 @@ export const addReminder: ResolverFunctionCarry =
         jid,
         msg: cleanMsg,
       };
+      mentionedJids && (scheduleData.mentionedJids = mentionedJids);
 
-      if (cleanRepeatAt.indexOf('repeat') === -1) {
+      if (matches[1].indexOf('repeat') === -1) {
         worker.schedule(cleanRepeatAt, agendaConstDefinition.send_reminder, scheduleData);
       } else {
+        let regexRes = cleanRepeatAt.match(/ +interval +(.+)/);
+        if (!regexRes) {
+          return {
+            destinationId: jid,
+            message: 'Please specify interval for repeated reminder',
+            type: MessageType.text,
+            options: {
+              quoted: message,
+            },
+          };
+        }
+
+        const numberNow = Date.now();
+        const date: Date = dateJs(cleanRepeatAt.replace(/ +interval.+/, ''));
+
+        if (numberNow === date.getTime()) {
+          return {
+            destinationId: jid,
+            message: 'Invalid format',
+            type: MessageType.text,
+            options: {
+              quoted: message,
+            },
+          };
+        }
+
         const job: Job<JobAttributesData> = worker.create(agendaConstDefinition.send_reminder, scheduleData);
-        const time = cleanRepeatAt.replace('repeat', '').trim();
-        job.schedule(time);
-        job.repeatAt(time);
+        job.schedule(date);
+        job.repeatEvery(regexRes[1], {
+          timezone: 'Asia/Jakarta',
+          skipImmediate: true,
+          computeNextRunAtImmediately: false,
+        });
         job.save();
       }
     } catch (err) {
@@ -56,10 +88,9 @@ export const addReminder: ResolverFunctionCarry =
       };
     }
 
-    const msg = `Reminder created`;
     return {
       destinationId: message.key.remoteJid,
-      message: msg,
+      message: 'Reminder created',
       type: MessageType.extendedText,
       options: {
         quoted: message,

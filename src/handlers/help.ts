@@ -4,16 +4,48 @@ import { ResolverFunctionCarry, ResolverResult } from '../types/type';
 export const helpReply: ResolverFunctionCarry =
   () =>
   (message: proto.WebMessageInfo, jid: string): ResolverResult => {
-    const msg = `List Commands :
-  1. help (Show this message)
-  \n
-  2. reminders add for time :time (repeat)? msg :msg (Add reminder, repeat if yo)
-  \n3. reminders list (Get active reminders )
-  4. reminders list with past (Get all reminders including past schedule / non active shedule)
-  \n5. reminders delete :id (Delete reminder, get the id from list command)
-  6. reminders delete with past :id (Delete reminder including non active / past schedule, get the id from list with past)
-  \n
-  7. sticker please (Convert image to sticker) Note : Use as a caption of your image
+    const msg = `
+List Commands :
+
+1. help 
+    (Show this message)
+
+2. reminders add for time :time msg :msg 
+    (Add reminder)
+
+3. reminders add for time :time interval :interval repeat msg :msg 
+    (Add repeated reminder, don't forget to set the interval)
+
+4. reminders list 
+    (Get active reminders )
+
+5. reminders list with past 
+    (Get all reminders including past schedule / non active shedule)
+
+6. reminders delete :id 
+    (Delete reminder, get the id from list command)
+
+7. reminders delete with past :id 
+    (Delete reminder including non active / past schedule, get the id from list with past command)
+
+8. sticker please 
+    (Convert image to sticker) Note : Use as a caption of your image
+
+9. quotes please 
+    (Get random quotes)
+
+10. bad quotes please 
+    (Get random bad quotes)
+
+11. love meter :nama and :nama
+    (Calculate your Love compatibility & chances of successful love relationship)
+
+12. joke pls
+    (Get random joke)
+
+13. dark joke pls
+    (Get random dark joke)
+
   `;
 
     return {

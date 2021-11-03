@@ -2,26 +2,30 @@ import { MessageType, proto } from '@adiwajshing/baileys';
 import axios from 'axios';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../types/type';
 
-export const badQuotes: ResolverFunctionCarry =
-  (): ResolverFunction =>
+export const joke: ResolverFunctionCarry =
+  (matches: RegExpMatchArray): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
-    const { data } = await axios.get('https://breaking-bad-quotes.herokuapp.com/v1/quotes'); // get random bad quotes
-    if (!Array.isArray(data) || !data.length) {
+    let isDark = false;
+    if (matches.length && matches[1]) {
+      isDark = true;
+    }
+    const { data } = await axios.get(
+      `https://v2.jokeapi.dev/joke/${
+        isDark ? 'Dark' : 'Any'
+      }?blacklistFlags=nsfw&format=txt`
+    );
+
+    if (!data) {
       return {
         destinationId: jid,
-        message: `Sorry, I don't have any quotes for you now`,
+        message: `Sorry, but I don't have any jokes for you now`,
         type: MessageType.text,
-        options: {
-          quoted: message,
-        },
       };
     }
-    const quote = data[0];
-    const sendMessage = `${quote.quote}\n\n-- ${quote.author} --`;
 
     return {
       destinationId: jid,
-      message: sendMessage,
+      message: data,
       type: MessageType.text,
       options: {
         quoted: message,

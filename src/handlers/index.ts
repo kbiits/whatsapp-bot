@@ -1,4 +1,4 @@
-import { MessageType, WAChatUpdate, WAConnection } from '@adiwajshing/baileys';
+import { isGroupID, MessageType, WAChatUpdate, WAConnection } from '@adiwajshing/baileys';
 import { ResolverResult } from '../types/type';
 import checkPrefix from '../utils/checkPrefix';
 import { getResolver } from '../utils/resolver';
@@ -17,7 +17,7 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
 
     const messageType = Object.keys(message.message)[0];
     if (messageType === MessageType.text) {
-      text = message.message?.conversation?.trim() ?? '';
+      text = message.message?.conversation ?? '';
     } else if (messageType === MessageType.extendedText) {
       text = message.message.extendedTextMessage.text;
     } else if (messageType === MessageType.image) {
@@ -25,7 +25,7 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
     }
 
     if (!checkPrefix(text)) {
-      if (chat.jid.match(/@g\.us$/) && text.indexOf('@everyone') !== -1) {
+      if (isGroupID(chat.jid) && text.indexOf('@everyone') !== -1) {
         const participantsJids = (await conn.groupMetadata(chat.jid)).participants.map((p) => p.jid) ?? [];
         await conn.sendMessage(chat.jid, '.', MessageType.extendedText, {
           quoted: message,
@@ -38,13 +38,13 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
       return;
     }
 
-    const chatTextArr = text.split(/ +/);
+    const chatTextArr = text.trim().split(/ +/);
 
     // if there's no command specified
     if (chatTextArr.length === 1) {
       conn.sendMessage(
         chat.jid,
-        `Halo, ${chat.jid.endsWith('@g.us') ? `@${message.participant.split('@')[0]}` : 'ada apa ?'}`,
+        `Halo, ${isGroupID(chat.jid) ? `@${message.participant.split('@')[0]}` : 'ada apa ?'}`,
         MessageType.extendedText,
         {
           contextInfo: {
