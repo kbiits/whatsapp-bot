@@ -25,7 +25,7 @@ export const convertToSticker: ResolverFunctionCarry =
         };
     }
 
-    if (tempMessage.imageMessage.fileLength > 1000 * 4) {
+    if (tempMessage.imageMessage.fileLength > 1000 * 1000 * 4) {
       return {
         destinationId: jid,
         message: `Cannot convert image with size greater than 4_000_000 bytes`,

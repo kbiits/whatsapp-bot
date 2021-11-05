@@ -14,15 +14,14 @@ export const commands: CommandMap = {
 
   '^reminders_add_for_time_(.+)_msg_(.+)': addReminderInterval,
   '^reminders_list(_with_past)?$': getReminders,
-  '^reminders_delete(_with_past)?_(\\d+)$': deleteReminder,
+  '^reminders_delete?(_with_past)?_(\\d+)$': deleteReminder,
 
   '^sticker_(?:pls|please)$': convertToSticker,
-  // '^gif2sticker_(?:pls|please)$': gifToSticker,
 
   '^quotes?_(?:pls|please)$': randomQuote,
   '^bad_quotes?_(?:pls|please)$': badQuotes,
 
-  '^love_meter_([A-Za-z0-9_]+)_dan_([A-Za-z0-9_]+)$': loveMeter,
+  '^love_meter_([A-Za-z0-9_\@]+)_(?:and|dan)_([A-Za-z0-9_\@]+)$': loveMeter,
 
   '^(dark_)?joke_(?:pls|please)$': joke,
 };

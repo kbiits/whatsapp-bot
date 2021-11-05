@@ -9,12 +9,20 @@ export default (agenda: Agenda) => {
     try {
       const data: ReminderScheduleData = job.attrs.data! as ReminderScheduleData;
       if (!isGroupID(data.jid)) {
-        await sock.sendMessage(data.jid, data.msg, MessageType.text);
+        await sock.sendMessage(data.jid, data.msg, MessageType.text, {
+          contextInfo: {
+            mentionedJid: data.mentionedJids,
+          },
+        });
         return;
       }
 
       if (data.msg.indexOf('@everyone') === -1) {
-        await sock.sendMessage(data.jid, data.msg, MessageType.text);
+        await sock.sendMessage(data.jid, data.msg, MessageType.text, {
+          contextInfo: {
+            mentionedJid: data.mentionedJids,
+          }
+      });
         return;
       }
 
