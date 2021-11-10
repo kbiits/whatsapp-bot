@@ -5,10 +5,12 @@ Lightweight Whatsapp bot for reminders based on baileys
 
 | Features |  |
 |-- |--|
-| Add Reminder | :heavy_check_mark: |
-| List Reminder | ✔️ |
-| Delete Reminder | ✔️ |
-| Help | ✔️ |
-| Voting | :x: |
+| Reminders | ✔️ |
+| Roles | ✔️ |
 | Tag everyone | ✔️ |
+| Tag role | ✔️ |
 | Image to Sticker | ✔️ |
+| Random Jokes | ✔️ |
+| Random Quotes | ✔️ |
+| Love meter | ✔️ |
+| Voting | :x: |
