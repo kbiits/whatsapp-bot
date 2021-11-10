@@ -14,7 +14,7 @@ export const convertToSticker: ResolverFunctionCarry =
     if (!tempMessage.imageMessage) {
       tempMessage = tempMessage?.extendedTextMessage?.contextInfo?.quotedMessage ?? null;
       // const tempImage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage ?? null;
-      if (!tempMessage.imageMessage ?? true)
+      if (!tempMessage || (!tempMessage.imageMessage ?? true))
         return {
           destinationId: jid,
           message: 'Please include the media when sending the command',

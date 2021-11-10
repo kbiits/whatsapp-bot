@@ -1,7 +1,9 @@
 import { isGroupID, MessageType, WAChatUpdate, WAConnection } from '@adiwajshing/baileys';
 import { ResolverResult } from '../types/type';
 import checkPrefix from '../utils/checkPrefix';
+import { getOnlyGroupId } from '../utils/getOnlyGroupId';
 import { getResolver } from '../utils/resolver';
+import { sendRoleMention } from '../utils/sendRoleMention';
 
 export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
   if (!chat.hasNewMessage) return;
@@ -25,16 +27,39 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
     }
 
     if (!checkPrefix(text)) {
-      if (isGroupID(chat.jid) && text.indexOf('@everyone') !== -1) {
-        const participantsJids = (await conn.groupMetadata(chat.jid)).participants.map((p) => p.jid) ?? [];
-        await conn.sendMessage(chat.jid, '.', MessageType.extendedText, {
-          quoted: message,
-          contextInfo: {
-            mentionedJid: participantsJids,
-          },
-        });
-        return;
+      if (isGroupID(chat.jid)) {
+        if (text.indexOf('@everyone') !== -1) {
+          const participantsJids = (await conn.groupMetadata(chat.jid)).participants.map((p) => p.jid) ?? [];
+          await conn.sendMessage(chat.jid, '.', MessageType.extendedText, {
+            quoted: message,
+            contextInfo: {
+              mentionedJid: participantsJids,
+            },
+          });
+          return;
+        }
+
+        let matches = text.trim().match(/@[A-Za-z0-9]+/g);
+        if (matches && matches.length) {
+          const sendMessage = await sendRoleMention(matches, getOnlyGroupId(chat.jid), chat.jid);
+          if (!sendMessage) return;
+          sendMessage.options && (sendMessage.options.quoted = message);
+          await conn.sendMessage(sendMessage.destinationId, sendMessage.message, sendMessage.type, sendMessage.options);
+          return;
+        }
       }
+      return;
+    }
+
+    if (process.env.IS_DEVELOPMENT !== 'false') {
+      await conn.sendMessage(
+        chat.jid,
+        "Sorry, currently my creator trying to improve me so I can't process your request now",
+        MessageType.text,
+        {
+          quoted: message,
+        }
+      );
       return;
     }
 

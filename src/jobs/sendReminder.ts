@@ -2,6 +2,9 @@ import { isGroupID, MessageType } from '@adiwajshing/baileys';
 import Agenda, { Job } from 'agenda';
 import { agendaConstDefinition } from '../constants/agenda';
 import { ReminderScheduleData } from '../types/type';
+import { getOnlyGroupId } from '../utils/getOnlyGroupId';
+import { getMentionsFromRoles, sendRoleMention } from '../utils/sendRoleMention';
+import uniq from 'lodash.uniq';
 import sock from './../socketConnection';
 
 export default (agenda: Agenda) => {
@@ -17,21 +20,35 @@ export default (agenda: Agenda) => {
         return;
       }
 
-      if (data.msg.indexOf('@everyone') === -1) {
-        await sock.sendMessage(data.jid, data.msg, MessageType.text, {
+      if (data.msg.indexOf('@everyone') !== -1) {
+        // if there's @everyone text in msg
+        const participants = (await sock.groupMetadata(data.jid)).participants;
+        const participantsJids = participants.map((p) => p.jid);
+
+        await sock.sendMessage(data.jid, data.msg, MessageType.extendedText, {
           contextInfo: {
-            mentionedJid: data.mentionedJids,
-          }
-      });
+            mentionedJid: participantsJids,
+          },
+        });
         return;
       }
 
-      const participants = (await sock.groupMetadata(data.jid)).participants;
-      const participantsJids = participants.map((p) => p.jid);
+      let matches = data.msg.trim().match(/@[A-Za-z0-9]+/g);
+      if (matches && matches.length) {
+        const mentionedJids = await getMentionsFromRoles(matches, getOnlyGroupId(data.jid));
+        mentionedJids &&
+          mentionedJids.length &&
+          (await sock.sendMessage(data.jid, data.msg, MessageType.extendedText, {
+            contextInfo: {
+              mentionedJid: uniq(mentionedJids, data.mentionedJids),
+            },
+          }));
+        return;
+      }
 
-      await sock.sendMessage(data.jid, data.msg, MessageType.extendedText, {
+      await sock.sendMessage(data.jid, data.msg, MessageType.text, {
         contextInfo: {
-          mentionedJid: participantsJids,
+          mentionedJid: data.mentionedJids,
         },
       });
     } catch (err) {

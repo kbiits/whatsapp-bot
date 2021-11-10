@@ -3,7 +3,7 @@ import { existsSync, writeFileSync } from 'fs';
 import { handler } from './handlers';
 
 const conn = new WAConnection();
-conn.version = [3, 3234, 9];
+conn.version = [2, 2140, 12];
 conn.connectOptions.maxRetries = 5;
 conn.on('open', () => {
   const authInfo = conn.base64EncodedAuthInfo(); // get all the auth info we need to restore this session
