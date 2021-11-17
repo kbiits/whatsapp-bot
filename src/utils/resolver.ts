@@ -3,7 +3,7 @@ import { wrongCommands } from '../handlers/wrongCommands';
 import { ResolverFunction } from '../types/type';
 
 export const getResolver = (intents: Array<string>): ResolverFunction => {
-  const string = intents.join('_');
+  const string = intents.join(' ');
   let regexResult: RegExpMatchArray = null;
 
   for (const key of Object.keys(commands)) {

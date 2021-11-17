@@ -10,10 +10,10 @@ List Commands :
 1. help 
     (Show this message)
 
-2. reminders add for time :time msg :msg 
+2. reminders add :time msg :msg 
     (Add reminder)
 
-3. reminders add for time :time interval :interval repeat msg :msg 
+3. reminders add :time interval :interval repeat msg :msg 
     (Add repeated reminder, don't forget to set the interval)
 
 4. reminders list 

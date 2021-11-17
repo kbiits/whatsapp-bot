@@ -18,23 +18,23 @@ import { CommandMap } from '../types/type';
 export const commands: CommandMap = {
   '^help$': helpReply,
 
-  '^reminders_add_for_time_(.+)_msg_(.+)': addReminderInterval,
-  '^reminders_list(_with_past)?$': getReminders,
-  '^reminders_delete?(_with_past)?_(\\d+)$': deleteReminder,
+  '^reminders add (.+) msg ([A-Za-z \n\r]+)$': addReminderInterval,
+  '^reminders list( with past)?$': getReminders,
+  '^reminders delete?( with past)? ([0-9,]+|all)$': deleteReminder,
 
-  '^stic?ker_(?:pls|please)$': convertToSticker,
+  '^stic?ker (?:pls|please)$': convertToSticker,
 
-  '^quotes?_(?:pls|please)$': randomQuote,
-  '^bad_quotes?_(?:pls|please)$': badQuotes,
+  '^quotes? (?:pls|please)$': randomQuote,
+  '^bad quotes? (?:pls|please)$': badQuotes,
 
-  '^love_meter_([A-Za-z0-9_@]+)_(?:and|dan)_([A-Za-z0-9_@]+)$': loveMeter,
+  '^love meter ([A-Za-z0-9_ @]+) (?:and|dan) ([A-Za-z0-9_ @]+)$': loveMeter,
 
-  '^(dark_)?joke_(?:pls|please)$': joke,
+  '^(dark )?joke (?:pls|please)$': joke,
 
-  '^create_roles?_([a-zA-Z0-9]+)$': addRole,
-  '^delete_role_([a-zA-Z0-9]+)$': deleteRole,
+  '^create roles? ([a-zA-Z0-9]+)$': addRole,
+  '^delete role ([a-zA-Z0-9]+)$': deleteRole,
   '^roles?$': listRole,
-  '^assign_([@ A-Za-z0-9_]+)_to_roles?_([a-zA-Z0-9]+)$': assignUserToRole,
-  '^remove_([@ A-Za-z0-9_]+)_from_roles?_([A-Za-z0-9]+)$': removeUserFromRole,
-  '^users?_in_roles?_([A-Za-z0-9@]+)$': getUsersForRole,
+  '^assign ([@ A-Za-z0-9_ ]+) to roles? ([a-zA-Z0-9]+)$': assignUserToRole,
+  '^remove ([@ A-Za-z0-9_ ]+) from roles? ([A-Za-z0-9]+)$': removeUserFromRole,
+  '^users? in roles? ([A-Za-z0-9@]+)$': getUsersForRole,
 };

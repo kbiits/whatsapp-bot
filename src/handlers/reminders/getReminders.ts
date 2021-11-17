@@ -6,12 +6,6 @@ import worker from './../../worker';
 export const getReminders: ResolverFunctionCarry =
   (matches: RegExpMatchArray): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
-    // const queryJid =
-    //   jid.indexOf('@g.us') === -1
-    //     ? jid
-    //     : {
-    //         $regex: `${jid.replace(/^\d*-/, '')}$`,
-    //       };
     const queryJid = jid;
     let query = {};
     if (!matches[1])

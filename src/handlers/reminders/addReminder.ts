@@ -21,8 +21,8 @@ export const addReminderInterval: ResolverFunctionCarry =
   (message: proto.WebMessageInfo, jid: string): ResolverResult => {
     const mentionedJids = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
     try {
-      const cleanRepeatAt = matches[1].replace(/_|repeat/g, ' ').trim();
-      const cleanMsg = matches[2].replace(/_/g, ' ');
+      const cleanRepeatAt = matches[1].replace(/repeat/g, ' ').trim();
+      const cleanMsg = matches[2];
 
       if (cleanRepeatAt.match(/seconds?|minutes?/)) {
         return sendBlockedRepeatInterval(message, jid);
@@ -34,28 +34,28 @@ export const addReminderInterval: ResolverFunctionCarry =
       };
       mentionedJids && (scheduleData.mentionedJids = mentionedJids);
 
+      const numberNow = Date.now();
+      const date: Date = dateJs(cleanRepeatAt.replace(/ +interval.+/, '').toLowerCase(), numberNow);
+
+      if (numberNow === date.getTime()) {
+        return {
+          destinationId: jid,
+          message: 'Invalid date format',
+          type: MessageType.text,
+          options: {
+            quoted: message,
+          },
+        };
+      }
+
       if (matches[1].indexOf('repeat') === -1) {
-        worker.schedule(cleanRepeatAt, agendaConstDefinition.send_reminder, scheduleData);
+        worker.schedule(date, agendaConstDefinition.send_reminder, scheduleData);
       } else {
         let regexRes = cleanRepeatAt.match(/ +interval +(.+)/);
         if (!regexRes) {
           return {
             destinationId: jid,
             message: 'Please specify interval for repeated reminder',
-            type: MessageType.text,
-            options: {
-              quoted: message,
-            },
-          };
-        }
-
-        const numberNow = Date.now();
-        const date: Date = dateJs(cleanRepeatAt.replace(/ +interval.+/, ''));
-
-        if (numberNow === date.getTime()) {
-          return {
-            destinationId: jid,
-            message: 'Invalid format',
             type: MessageType.text,
             options: {
               quoted: message,
