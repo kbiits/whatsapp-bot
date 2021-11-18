@@ -1,28 +1,18 @@
 import { MessageType, proto } from '@adiwajshing/baileys';
 import axios from 'axios';
+import { getRandomQuoteProvider } from '../providers/Quote';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../types/type';
 
 export const randomQuote: ResolverFunctionCarry =
   (): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
-    const { data } = await axios.get('https://api.quotable.io/random');
+    const QuoteProvider = getRandomQuoteProvider();
 
-    if (!data) {
-      return {
-        destinationId: jid,
-        message: `Sorry, I don't have any quotes for you now`,
-        type: MessageType.text,
-        options: {
-          quoted: message,
-        },
-      };
-    }
-
-    const msg = `${data.content}\n\n-- ${data.author} --`;
+    const msg = await QuoteProvider.getRandomQuote();
 
     return {
       destinationId: jid,
-      message: msg,
+      message: msg as string,
       type: MessageType.text,
       options: {
         quoted: message,

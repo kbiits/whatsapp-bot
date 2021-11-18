@@ -1,4 +1,3 @@
-import { badQuotes } from '../handlers/badQuotes';
 import { helpReply } from '../handlers/help';
 import { convertToSticker } from '../handlers/img2sticker';
 import { joke } from '../handlers/joke';
@@ -25,7 +24,6 @@ export const commands: CommandMap = {
   '^stic?ker (?:pls|please)$': convertToSticker,
 
   '^quotes? (?:pls|please)$': randomQuote,
-  '^bad quotes? (?:pls|please)$': badQuotes,
 
   '^love meter ([A-Za-z0-9_ @]+) (?:and|dan) ([A-Za-z0-9_ @]+)$': loveMeter,
 

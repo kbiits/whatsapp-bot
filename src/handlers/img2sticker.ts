@@ -36,7 +36,6 @@ export const convertToSticker: ResolverFunctionCarry =
       };
     }
 
-    const imageMessage: Buffer = (await downloadMediaIMessageBuffer(tempMessage)) as Buffer;
     let mimeType: Mimetype = tempMessage.imageMessage.mimetype as Mimetype;
 
     if (!mimeType) mimeType = message.message.imageMessage.mimetype as Mimetype;
@@ -51,13 +50,23 @@ export const convertToSticker: ResolverFunctionCarry =
       };
     }
 
+    const ratio = tempMessage.imageMessage.width / tempMessage.imageMessage.height;
+
+    const imageMessage: Buffer = (await downloadMediaIMessageBuffer(tempMessage)) as Buffer;
+
     conn.sendMessage(jid, 'Wait a minute', MessageType.text);
     try {
       const bufferWebp = await sharp(imageMessage, {
         failOnError: true,
       })
         .resize(512, 512, {
-          fit: 'cover',
+          fit: Math.abs(ratio - 1) > 0.3 ? 'contain' : 'cover',
+          background: {
+            r: 0,
+            b: 0,
+            g: 0,
+            alpha: 0,
+          },
         })
         .webp()
         .toBuffer();

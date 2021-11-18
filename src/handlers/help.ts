@@ -34,34 +34,31 @@ List Commands :
 9. quotes please 
     (Get random quotes)
 
-10. bad quotes please 
-    (Get random bad quotes)
-
-11. love meter :nama and :nama
+10. love meter :nama and :nama
     (Calculate your Love compatibility & chances of successful love relationship)
 
-12. joke pls
+11. joke pls
     (Get random joke)
 
-13. dark joke pls
+12. dark joke pls
     (Get random dark joke)
 
-14. create role :name
+13. create role :name
     (Create role with given name)
 
-15. delete role :name
+14. delete role :name
     (Delete role)
 
-16. roles
+15. roles
     (See all roles in this group chat)
 
-17. assign :mentions... to role :name
+16. assign :mentions... to role :name
     (Assign all mentioned users to a role)
 
-18. remove :mentions... from role :name
+17. remove :mentions... from role :name
     (Remove all mentioned users from a role)
 
-19. users in role :name
+18. users in role :name
     (See all users assigned to the role)
     
   `;
