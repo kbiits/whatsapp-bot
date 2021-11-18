@@ -63,10 +63,8 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
       return;
     }
 
-    const chatTextArr = text.trim().split(/ +/);
-
     // if there's no command specified
-    if (chatTextArr.length === 1) {
+    if (text.trim().match(/^ *\/pe *$/)) {
       conn.sendMessage(
         chat.jid,
         `Halo, ${isGroupID(chat.jid) ? `@${message.participant.split('@')[0]}` : 'ada apa ?'}`,
@@ -80,8 +78,7 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
       return;
     }
 
-    chatTextArr.shift();
-    const resolver = getResolver(chatTextArr);
+    const resolver = getResolver(text.replace(/^ *\/pe */, ''));
 
     const sendMessage: ResolverResult = await resolver(message, chat.jid);
 

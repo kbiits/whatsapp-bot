@@ -40,17 +40,17 @@ class CommonQuoteProvider implements Quote {
   }
 }
 
-type AbstractProviderFactory = {
+type QuoteProviderFactory = {
   [key: string]: () => Quote;
 };
 
-const ProviderFactory: AbstractProviderFactory = {
+const QuoteProviderFactory: QuoteProviderFactory = {
   '1': (): Quote => new CommonQuoteProvider(),
   '2': (): Quote => new BadQuoteProvider(),
 };
 
 export const getRandomQuoteProvider = (): Quote => {
-  const listKeys = Object.keys(ProviderFactory);
-  const ConcreteQuoteProvider: Quote = ProviderFactory[listKeys[Math.floor(Math.random() * listKeys.length)]]();
+  const listKeys = Object.keys(QuoteProviderFactory);
+  const ConcreteQuoteProvider: Quote = QuoteProviderFactory[listKeys[Math.floor(Math.random() * listKeys.length)]]();
   return ConcreteQuoteProvider;
 };

@@ -27,7 +27,7 @@ export const commands: CommandMap = {
 
   '^love meter ([A-Za-z0-9_ @]+) (?:and|dan) ([A-Za-z0-9_ @]+)$': loveMeter,
 
-  '^(dark )?joke (?:pls|please)$': joke,
+  '^(dark )?joke (?:pls|please)[ ]*(?:--)?([a-z0-9 ]+)?$': joke,
 
   '^create roles? ([a-zA-Z0-9]+)$': addRole,
   '^delete role ([a-zA-Z0-9]+)$': deleteRole,

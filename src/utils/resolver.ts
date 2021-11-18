@@ -2,13 +2,12 @@ import { commands } from '../constants/commands';
 import { wrongCommands } from '../handlers/wrongCommands';
 import { ResolverFunction } from '../types/type';
 
-export const getResolver = (intents: Array<string>): ResolverFunction => {
-  const string = intents.join(' ');
+export const getResolver = (chatText: string): ResolverFunction => {
   let regexResult: RegExpMatchArray = null;
 
   for (const key of Object.keys(commands)) {
     const regex = new RegExp(key, 'i');
-    regexResult = string.match(regex);
+    regexResult = chatText.match(regex);
     if (regexResult) {
       return commands[key](regexResult);
     }
