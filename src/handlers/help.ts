@@ -43,22 +43,25 @@ List Commands :
 12. dark joke pls
     (Get random dark joke)
 
-13. create role :name
+13. meme pls
+    (Get random meme)
+
+14. create role :name
     (Create role with given name)
 
-14. delete role :name
+15. delete role :name
     (Delete role)
 
-15. roles
+16. roles
     (See all roles in this group chat)
 
-16. assign :mentions... to role :name
+17. assign :mentions... to role :name
     (Assign all mentioned users to a role)
 
-17. remove :mentions... from role :name
+18. remove :mentions... from role :name
     (Remove all mentioned users from a role)
 
-18. users in role :name
+19. users in role :name
     (See all users assigned to the role)
     
   `;

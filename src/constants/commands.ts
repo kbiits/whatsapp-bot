@@ -2,6 +2,7 @@ import { helpReply } from '../handlers/help';
 import { convertToSticker } from '../handlers/img2sticker';
 import { joke } from '../handlers/joke';
 import { loveMeter } from '../handlers/loveMeter';
+import { meme } from '../handlers/meme';
 import { randomQuote } from '../handlers/randomQuote';
 import { addReminderInterval } from '../handlers/reminders/addReminder';
 import { deleteReminder } from '../handlers/reminders/deleteReminder';
@@ -28,6 +29,8 @@ export const commands: CommandMap = {
   '^love meter ([A-Za-z0-9_ @]+) (?:and|dan) ([A-Za-z0-9_ @]+)$': loveMeter,
 
   '^(dark )?joke (?:pls|please)[ ]*(?:--)?([a-z0-9 ]+)?$': joke,
+
+  '^meme (?:pls|please)[ ]*(?:--)?([a-z0-9 ]+)?$': meme,
 
   '^create roles? ([a-zA-Z0-9]+)$': addRole,
   '^delete role ([a-zA-Z0-9]+)$': deleteRole,

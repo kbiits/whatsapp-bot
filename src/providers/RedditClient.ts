@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { URLSearchParams } from 'url';
 
 const TOKEN_BASE_URL = 'https://www.reddit.com/api/v1/access_token';
-const REQUEST_TIMEOUT = 30 * 1000;
+const REQUEST_TIMEOUT = 2 * 60 * 1000;
 
 export class RedditClient {
   username: string;

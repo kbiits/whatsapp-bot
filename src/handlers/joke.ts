@@ -1,6 +1,8 @@
 import { MessageType, proto } from '@adiwajshing/baileys';
+import InvalidOptionError from '../exceptions/InvalidOptionError';
 import { getRandomJokeProvider } from '../providers/Jokes/Joke';
 import { JokeModel } from '../providers/Jokes/JokeModel';
+import conn from '../socketConnection';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../types/type';
 
 export const joke: ResolverFunctionCarry =
@@ -14,8 +16,26 @@ export const joke: ResolverFunctionCarry =
     const JokeProvider = getRandomJokeProvider();
     let joke: JokeModel;
     try {
-      joke = await JokeProvider.getRandomJoke();
+      const jokeGenerator = matches[2] ? JokeProvider.getRandomJoke(matches[2].trim()) : JokeProvider.getRandomJoke();
+      for await (const j of jokeGenerator) {
+        if (j.loading) {
+          await conn.sendMessage(jid, 'Wait a minute', MessageType.text);
+        } else {
+          joke = j as JokeModel;
+          break;
+        }
+      }
     } catch (error) {
+      if (error instanceof InvalidOptionError) {
+        return {
+          destinationId: jid,
+          message: error.message,
+          type: MessageType.extendedText,
+          options: {
+            quoted: message,
+          },
+        };
+      }
       console.log(error);
       return {
         destinationId: jid,
@@ -40,6 +60,7 @@ export const joke: ResolverFunctionCarry =
       type: joke.mediaType === 'video' ? MessageType.video : MessageType.image,
       options: {
         caption: joke.text,
+        mimetype: joke.mimeType,
       },
     };
   };

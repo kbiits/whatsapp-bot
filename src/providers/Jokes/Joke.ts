@@ -1,8 +1,8 @@
 import { JokeModel } from './JokeModel';
-import { RedditJokeProvider } from './RedditJokeProvider';
+import RedditJokeProvider from './Reddit/RedditJokeProvider';
 
 export interface JokeProvider {
-  getRandomJoke(): Promise<JokeModel>;
+  getRandomJoke: (opt?: string) => AsyncGenerator<JokeModel>;
 }
 
 type JokeProviderFactory = {
@@ -15,6 +15,6 @@ const JokeProviders: JokeProviderFactory = {
 
 export const getRandomJokeProvider = (): JokeProvider => {
   const listKeys = Object.keys(JokeProviders);
-  const ConcreteQuoteProvider: JokeProvider = JokeProviders[listKeys[Math.floor(Math.random() * listKeys.length)]]();
-  return ConcreteQuoteProvider;
+  const ConcreteJokeProvider: JokeProvider = JokeProviders[listKeys[Math.floor(Math.random() * listKeys.length)]]();
+  return ConcreteJokeProvider;
 };
