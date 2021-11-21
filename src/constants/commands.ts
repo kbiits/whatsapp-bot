@@ -18,7 +18,7 @@ import { CommandMap } from '../types/type';
 export const commands: CommandMap = {
   '^help$': helpReply,
 
-  '^reminders add (.+) msg ([A-Za-z \n\r]+)$': addReminderInterval,
+  '^reminders add (.+) msg ([\\s\\S]+)$': addReminderInterval,
   '^reminders list( with past)?$': getReminders,
   '^reminders delete?( with past)? ([0-9,]+|all)$': deleteReminder,
 
