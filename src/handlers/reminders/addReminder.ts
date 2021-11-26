@@ -16,9 +16,9 @@ const sendBlockedRepeatInterval = (message: WAMessage, jid: string): ResolverRes
   };
 };
 
-export const addReminderInterval: ResolverFunctionCarry =
+export const addReminder: ResolverFunctionCarry =
   (matches: RegExpMatchArray) =>
-  (message: proto.WebMessageInfo, jid: string): ResolverResult => {
+  async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
     const mentionedJids = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
     try {
       const cleanRepeatAt = matches[1].replace(/repeat/g, ' ').trim();
@@ -49,7 +49,7 @@ export const addReminderInterval: ResolverFunctionCarry =
       }
 
       if (matches[1].indexOf('repeat') === -1) {
-        worker.schedule(date, agendaConstDefinition.send_reminder, scheduleData);
+        await worker.schedule(date, agendaConstDefinition.send_reminder, scheduleData);
       } else {
         let regexRes = cleanRepeatAt.match(/ +interval +(.+)/);
         if (!regexRes) {
@@ -70,7 +70,7 @@ export const addReminderInterval: ResolverFunctionCarry =
           skipImmediate: true,
           computeNextRunAtImmediately: false,
         });
-        job.save();
+        await job.save();
       }
     } catch (err) {
       console.log('error');

@@ -39,7 +39,7 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
           return;
         }
 
-        let matches = text.trim().match(/@[A-Za-z0-9]+/g);
+        let matches = text.trim().match(/@[A-Za-z0-9-_]+/g);
         if (matches && matches.length) {
           const sendMessage = await sendRoleMention(matches, getOnlyGroupId(chat.jid), chat.jid);
           if (!sendMessage) return;
@@ -78,7 +78,7 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
       return;
     }
 
-    const resolver = getResolver(text.replace(/^ *\/pe */, ''));
+    const resolver = getResolver(text.replace(/^ *\/pe */, '').replace(/ +/, ' '));
 
     const sendMessage: ResolverResult = await resolver(message, chat.jid);
 

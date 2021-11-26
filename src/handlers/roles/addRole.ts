@@ -20,7 +20,7 @@ export const addRole: ResolverFunctionCarry =
 
     const role = matches[1].replace(/[ @]*/g, '');
 
-    if (!role.match(/^[A-Za-z]+/)) {
+    if (!role.match(/^[A-Za-z]+/)) { // role can only start with alphabet
       return {
         destinationId: jid,
         message: 'Role hanya boleh berawalan huruf alphabet',

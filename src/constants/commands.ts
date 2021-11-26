@@ -4,7 +4,7 @@ import { joke } from '../handlers/joke';
 import { loveMeter } from '../handlers/loveMeter';
 import { meme } from '../handlers/meme';
 import { randomQuote } from '../handlers/randomQuote';
-import { addReminderInterval } from '../handlers/reminders/addReminder';
+import { addReminder } from '../handlers/reminders/addReminder';
 import { deleteReminder } from '../handlers/reminders/deleteReminder';
 import { getReminders } from '../handlers/reminders/getReminders';
 import { addRole } from '../handlers/roles/addRole';
@@ -18,9 +18,9 @@ import { CommandMap } from '../types/type';
 export const commands: CommandMap = {
   '^help$': helpReply,
 
-  '^reminders add (.+) msg ([\\s\\S]+)$': addReminderInterval,
+  '^reminders add (.+) msg ([\\s\\S]+)$': addReminder,
   '^reminders list( with past)?$': getReminders,
-  '^reminders delete?( with past)? ([0-9,]+|all)$': deleteReminder,
+  '^reminders delete?( with past)? ([0-9,\\s]+|all)$': deleteReminder,
 
   '^stic?ker (?:pls|please)$': convertToSticker,
 
@@ -32,10 +32,10 @@ export const commands: CommandMap = {
 
   '^meme (?:pls|please)[ ]*(?:--)?([a-z0-9 ]+)?$': meme,
 
-  '^create roles? ([a-zA-Z0-9]+)$': addRole,
+  '^create roles? ([a-zA-Z0-9\-_@]+)$': addRole,
   '^delete role ([a-zA-Z0-9]+)$': deleteRole,
   '^roles?$': listRole,
-  '^assign ([@ A-Za-z0-9_ ]+) to roles? ([a-zA-Z0-9]+)$': assignUserToRole,
-  '^remove ([@ A-Za-z0-9_ ]+) from roles? ([A-Za-z0-9]+)$': removeUserFromRole,
-  '^users? in roles? ([A-Za-z0-9@]+)$': getUsersForRole,
+  '^assign ([@ A-Za-z0-9_ ]+) to roles? ([a-zA-Z0-9\-_@]+)$': assignUserToRole,
+  '^remove ([@ A-Za-z0-9_ ]+) from roles? ([A-Za-z0-9\-_@]+)$': removeUserFromRole,
+  '^users? in roles? ([A-Za-z0-9\-_@]+)$': getUsersForRole,
 };

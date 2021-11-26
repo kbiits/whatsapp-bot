@@ -33,7 +33,7 @@ export default (agenda: Agenda) => {
         return;
       }
 
-      let matches = data.msg.trim().match(/@[A-Za-z0-9]+/g);
+      let matches = data.msg.trim().match(/@[A-Za-z]+.*/g); // role can only start with alphabet
       if (matches && matches.length) {
         const mentionedJids = await getMentionsFromRoles(matches, getOnlyGroupId(data.jid));
         mentionedJids &&

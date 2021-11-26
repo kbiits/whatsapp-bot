@@ -60,7 +60,7 @@ export const convertToSticker: ResolverFunctionCarry =
         failOnError: true,
       })
         .resize(512, 512, {
-          fit: Math.abs(ratio - 1) > 0.3 ? 'contain' : 'cover',
+          fit: Math.abs(ratio - 1) > 0.1 ? 'contain' : 'cover',
           background: {
             r: 0,
             b: 0,
