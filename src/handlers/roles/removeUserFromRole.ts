@@ -1,20 +1,18 @@
 import { MessageType, proto } from '@adiwajshing/baileys';
-import RoleModel from '../../models/Role';
-import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../../types/type';
-import { getOnlyGroupId } from '../../utils/getOnlyGroupId';
 import diff from 'lodash.difference';
 import union from 'lodash.union';
+import RoleModel from '../../models/Role';
+import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../../types/type';
 
 export const removeUserFromRole: ResolverFunctionCarry =
   (matches: RegExpMatchArray): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
     const users = matches[1].trim();
     const roleName = matches[2].replace(/[ @]*/g, '');
-    const groupId = getOnlyGroupId(jid);
 
     const role = await RoleModel.findOne({
       name: roleName,
-      groupId,
+      groupId: jid,
     }).exec();
 
     if (!role) {

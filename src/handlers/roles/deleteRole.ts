@@ -1,7 +1,6 @@
 import { isGroupID, MessageType, proto } from '@adiwajshing/baileys';
 import RoleModel from '../../models/Role';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../../types/type';
-import { getOnlyGroupId } from '../../utils/getOnlyGroupId';
 
 export const deleteRole: ResolverFunctionCarry =
   (matches: RegExpMatchArray): ResolverFunction =>
@@ -18,11 +17,9 @@ export const deleteRole: ResolverFunctionCarry =
     }
 
     const roleName = matches[1].replace(/[ @]*/g, '');
-    const groupId = getOnlyGroupId(jid);
-
     const result = await RoleModel.deleteOne({
       name: roleName,
-      groupId,
+      groupId: jid,
     }).exec();
 
     if (result.deletedCount <= 0) {

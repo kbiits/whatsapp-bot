@@ -1,10 +1,9 @@
 import { isGroupID, MessageType } from '@adiwajshing/baileys';
 import Agenda, { Job } from 'agenda';
+import uniq from 'lodash.uniq';
 import { agendaConstDefinition } from '../constants/agenda';
 import { ReminderScheduleData } from '../types/type';
-import { getOnlyGroupId } from '../utils/getOnlyGroupId';
-import { getMentionsFromRoles, sendRoleMention } from '../utils/sendRoleMention';
-import uniq from 'lodash.uniq';
+import { getMentionsFromRoles } from '../utils/sendRoleMention';
 import sock from './../socketConnection';
 
 export default (agenda: Agenda) => {
@@ -35,7 +34,7 @@ export default (agenda: Agenda) => {
 
       let matches = data.msg.trim().match(/@[A-Za-z]+.*/g); // role can only start with alphabet
       if (matches && matches.length) {
-        const mentionedJids = await getMentionsFromRoles(matches, getOnlyGroupId(data.jid));
+        const mentionedJids = await getMentionsFromRoles(matches, data.jid);
         mentionedJids &&
           mentionedJids.length &&
           (await sock.sendMessage(data.jid, data.msg, MessageType.extendedText, {
@@ -54,6 +53,8 @@ export default (agenda: Agenda) => {
     } catch (err) {
       console.log('Failed to run job, err :');
       console.log(err);
+      console.log('error job : ');
+      console.log(JSON.stringify(job.toJSON(), null, 4));
       return;
     }
   });

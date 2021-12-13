@@ -10,10 +10,10 @@ export const convertToSticker: ResolverFunctionCarry =
   (): ResolverFunction =>
   async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
     let tempMessage: proto.IMessage = message.message;
+    let mediaType: "image" | "video";
 
     if (!tempMessage.imageMessage) {
       tempMessage = tempMessage?.extendedTextMessage?.contextInfo?.quotedMessage ?? null;
-      // const tempImage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage ?? null;
       if (!tempMessage || (!tempMessage.imageMessage ?? true))
         return {
           destinationId: jid,
@@ -23,6 +23,8 @@ export const convertToSticker: ResolverFunctionCarry =
             quoted: message,
           },
         };
+    } else {
+
     }
 
     if (tempMessage.imageMessage.fileLength > 1000 * 1000 * 4) {

@@ -1,7 +1,6 @@
 import { isGroupID, MessageType } from '@adiwajshing/baileys';
 import RoleModel, { Role } from '../../models/Role';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../../types/type';
-import { getOnlyGroupId } from '../../utils/getOnlyGroupId';
 
 export const listRole: ResolverFunctionCarry =
   (): ResolverFunction =>
@@ -17,8 +16,7 @@ export const listRole: ResolverFunctionCarry =
       };
     }
 
-    const groupId = getOnlyGroupId(jid);
-    let roles: Array<Role> = await RoleModel.find({ groupId }).exec();
+    let roles: Array<Role> = await RoleModel.find({ groupId: jid }).exec();
 
     if (!roles.length) {
       return {

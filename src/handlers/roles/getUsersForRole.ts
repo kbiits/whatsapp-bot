@@ -1,7 +1,6 @@
 import { isGroupID, MessageType } from '@adiwajshing/baileys';
-import RoleModel, { Role } from '../../models/Role';
+import RoleModel from '../../models/Role';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../../types/type';
-import { getOnlyGroupId } from '../../utils/getOnlyGroupId';
 
 export const getUsersForRole: ResolverFunctionCarry =
   (matches: RegExpMatchArray): ResolverFunction =>
@@ -18,10 +17,9 @@ export const getUsersForRole: ResolverFunctionCarry =
     }
 
     const roleName = matches[1].replace(/[ @]*/g, '');
-    const groupId = getOnlyGroupId(jid);
     const role = await RoleModel.findOne({
       name: roleName,
-      groupId,
+      groupId: jid,
     }).exec();
 
     if (!role) {

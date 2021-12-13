@@ -1,19 +1,34 @@
-import { MessageType, proto } from '@adiwajshing/baileys';
+import { isGroupID, MessageType, proto } from '@adiwajshing/baileys';
+import PrefixModel from '../models/Prefix';
 import { ResolverFunctionCarry, ResolverResult } from '../types/type';
 
 export const helpReply: ResolverFunctionCarry =
-  () =>
-  (message: proto.WebMessageInfo, jid: string): ResolverResult => {
-    const msg = `
-List Commands :
+    () =>
+        async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
+            let prefix: string;
+            if (isGroupID(jid)) {
+                const prefixModel = await PrefixModel.findOne({
+                    jid,
+                }).exec();
+                prefix = prefixModel ? prefixModel.prefix : process.env.DEFAULT_PREFIX;
+            } else {
+                prefix = process.env.DEFAULT_PREFIX;
+            }
+
+            const msg = `
+Your prefix : /${prefix}
+
+Usage : /${prefix} _:command_
+
+Command List :
 
 1. help 
     (Show this message)
 
-2. reminders add :time msg :msg 
+2. reminders add _:time_ msg _:msg_
     (Add reminder)
 
-3. reminders add :time interval :interval repeat msg :msg 
+3. reminders add _:time_ interval _:interval_ repeat msg _:msg_ 
     (Add repeated reminder, don't forget to set the interval)
 
 4. reminders list 
@@ -22,10 +37,10 @@ List Commands :
 5. reminders list with past 
     (Get all reminders including past schedule / non active shedule)
 
-6. reminders delete :id 
+6. reminders delete _:id_
     (Delete reminder, get the id from list command)
 
-7. reminders delete with past :id 
+7. reminders delete with past _:id_ 
     (Delete reminder including non active / past schedule, get the id from list with past command)
 
 8. sticker please 
@@ -34,7 +49,7 @@ List Commands :
 9. quotes please 
     (Get random quotes)
 
-10. love meter :nama and :nama
+10. love meter _:name_ and _:name_
     (Calculate your Love compatibility & chances of successful love relationship)
 
 11. joke pls
@@ -46,35 +61,37 @@ List Commands :
 13. meme pls
     (Get random meme)
 
-14. create role :name
+14. create role _:name_
     (Create role with given name)
 
-15. delete role :name
+15. delete role _:name_
     (Delete role)
 
 16. roles
     (See all roles in this group chat)
 
-17. assign :mentions... to role :name
+17. assign :mentions... to role _:name_
     (Assign all mentioned users to a role)
 
-18. remove :mentions... from role :name
+18. remove :mentions... from role _:name_
     (Remove all mentioned users from a role)
 
-19. users in role :name
+19. users in role _:name_
     (See all users assigned to the role)
+
+20. change prefix _:your-new-prefix_
     
   `;
 
-    return {
-      destinationId: jid,
-      message: msg,
-      type: MessageType.text,
-      options: {
-        quoted: message,
-        contextInfo: {
-          quotedMessage: message.message,
-        },
-      },
-    };
-  };
+            return {
+                destinationId: jid,
+                message: msg,
+                type: MessageType.text,
+                options: {
+                    quoted: message,
+                    contextInfo: {
+                        quotedMessage: message.message,
+                    },
+                },
+            };
+        };

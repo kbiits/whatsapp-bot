@@ -1,10 +1,7 @@
 import { isGroupID, MessageType, proto } from '@adiwajshing/baileys';
-import { UpdateResult } from 'mongodb';
-import { Error, NativeError } from 'mongoose';
-import RoleModel, { Role } from '../../models/Role';
-import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../../types/type';
-import { getOnlyGroupId } from '../../utils/getOnlyGroupId';
 import union from 'lodash.union';
+import RoleModel from '../../models/Role';
+import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../../types/type';
 
 export const assignUserToRole: ResolverFunctionCarry =
   (matches: RegExpMatchArray): ResolverFunction =>
@@ -22,11 +19,9 @@ export const assignUserToRole: ResolverFunctionCarry =
 
     const participants = matches[1].trim();
     const roleName = matches[2].replace(/[ @]*/g, '');
-    const groupId = getOnlyGroupId(jid);
-
     const role = await RoleModel.findOne({
       name: roleName,
-      groupId,
+      groupId: jid,
     }).exec();
 
     if (!role) {
