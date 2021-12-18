@@ -4,22 +4,22 @@ export interface CommandMap {
   [key: string]: ResolverFunctionCarry;
 }
 
-export type ResolverFunction = (message: proto.WebMessageInfo, jid: string) => Promise<ResolverResult> | ResolverResult;
+export type ResolverFunction = (message: proto.WebMessageInfo, jid: string, isFromGroup: Boolean) => Promise<ResolverResult> | ResolverResult;
 
 export type ResolverFunctionCarry = (matches: RegExpMatchArray) => ResolverFunction;
 
 export interface ResolverResult {
   destinationId: string;
   message:
-    | string
-    | proto.ExtendedTextMessage
-    | WALocationMessage
-    | proto.ContactMessage
-    | proto.ContactsArrayMessage
-    | proto.GroupInviteMessage
-    | WAMediaUpload
-    | proto.ListMessage
-    | proto.ButtonsMessage;
+  | string
+  | proto.ExtendedTextMessage
+  | WALocationMessage
+  | proto.ContactMessage
+  | proto.ContactsArrayMessage
+  | proto.GroupInviteMessage
+  | WAMediaUpload
+  | proto.ListMessage
+  | proto.ButtonsMessage;
   type: MessageType;
   options?: MessageOptions;
 }

@@ -1,12 +1,12 @@
-import { isGroupID, MessageType, proto } from '@adiwajshing/baileys';
+import { MessageType, proto } from '@adiwajshing/baileys';
 import PrefixModel from '../models/Prefix';
 import { ResolverFunctionCarry, ResolverResult } from '../types/type';
 
 export const helpReply: ResolverFunctionCarry =
     () =>
-        async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
+        async (message: proto.WebMessageInfo, jid: string, isFromGroup: Boolean): Promise<ResolverResult> => {
             let prefix: string;
-            if (isGroupID(jid)) {
+            if (isFromGroup) {
                 const prefixModel = await PrefixModel.findOne({
                     jid,
                 }).exec();

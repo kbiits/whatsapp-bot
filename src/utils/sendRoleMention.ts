@@ -2,8 +2,8 @@ import { MessageType } from '@adiwajshing/baileys';
 import RoleModel from '../models/Role';
 import { ResolverResult } from '../types/type';
 
-export const sendRoleMention = async (roles: Array<string>, groupId: string, jid: string): Promise<ResolverResult> => {
-  const mentionedJids = await getMentionsFromRoles(roles, groupId);
+export const sendRoleMention = async (roles: Array<string>, jid: string): Promise<ResolverResult> => {
+  const mentionedJids = await getMentionsFromRoles(roles, jid);
 
   if (!mentionedJids || !mentionedJids.length) {
     return null;

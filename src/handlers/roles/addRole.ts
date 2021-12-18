@@ -1,12 +1,11 @@
-import { isGroupID, MessageType, proto } from '@adiwajshing/baileys';
-import RoleModel from '../../models/Role';
-import Role from '../../models/Role';
+import { MessageType, proto } from '@adiwajshing/baileys';
+import { default as Role, default as RoleModel } from '../../models/Role';
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from '../../types/type';
 
 export const addRole: ResolverFunctionCarry =
   (matches: RegExpMatchArray): ResolverFunction =>
-    async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
-      if (!isGroupID(jid)) {
+    async (message: proto.WebMessageInfo, jid: string, isFromGroup: Boolean): Promise<ResolverResult> => {
+      if (!isFromGroup) {
         return {
           destinationId: jid,
           message: 'You can only use role features inside group chat',

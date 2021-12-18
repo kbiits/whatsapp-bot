@@ -1,9 +1,10 @@
-import { isGroupID, MessageType, proto } from "@adiwajshing/baileys";
+import { MessageType, proto } from "@adiwajshing/baileys";
 import PrefixModel from "../../models/Prefix";
 import { ResolverFunction, ResolverFunctionCarry, ResolverResult } from "../../types/type";
 
-export const updatePrefix: ResolverFunctionCarry = (matches: RegExpMatchArray): ResolverFunction => async (message: proto.WebMessageInfo, jid: string): Promise<ResolverResult> => {
-    if (!isGroupID(jid)) {
+export const updatePrefix: ResolverFunctionCarry = (matches: RegExpMatchArray): ResolverFunction => async (message: proto.WebMessageInfo, jid: string, isFromGroup: Boolean): Promise<ResolverResult> => {
+
+    if (!isFromGroup) {
         return {
             destinationId: jid,
             message: 'You can only use this feature inside group chat',
@@ -15,6 +16,17 @@ export const updatePrefix: ResolverFunctionCarry = (matches: RegExpMatchArray): 
     }
 
     const newPrefix = matches[1].replace(/^ *\//, '');
+    if (!newPrefix.length) {
+        return {
+            destinationId: jid,
+            message: "Cannot use empty string for prefix",
+            type: MessageType.extendedText,
+            options: {
+                quoted: message,
+            }
+        };
+    }
+
     try {
         await PrefixModel.updateOne({
             jid,
@@ -32,6 +44,8 @@ export const updatePrefix: ResolverFunctionCarry = (matches: RegExpMatchArray): 
         }
     } catch (error) {
         console.log('Failed to update prefix');
+        console.log("jid : ", jid);
+        console.log("newPrefix : ", newPrefix);
         console.log(error);
 
         return {

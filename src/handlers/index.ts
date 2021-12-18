@@ -1,9 +1,8 @@
 import { isGroupID, MessageType, WAChatUpdate, WAConnection } from '@adiwajshing/baileys';
-import { ResolverResult } from '../types/type';
+import { ResolverFunction, ResolverResult } from '../types/type';
 import checkPrefix from '../utils/checkPrefix';
-import { getResolver } from '../utils/resolver';
-import { sendRoleMention } from '../utils/sendRoleMention';
-import { helpReply } from './help';
+import { getResolver, getResolverWithoutPrefix } from '../utils/resolver';
+import { escapeRegExp } from '../utils/stringUtils';
 
 
 export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
@@ -18,6 +17,7 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
     if (!message.message) return;
     if (message.key?.fromMe ?? true) return;
     let text = '';
+    const isFromGroup = isGroupID(chat.jid);
 
     const messageType = Object.keys(message.message)[0];
     if (messageType === MessageType.text) {
@@ -30,35 +30,25 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
 
     const prefix = text.length && await checkPrefix(text.match(/(\S+)/)[1], chat.jid);
     if (!prefix) {
-      const isFromGroup = isGroupID(chat.jid);
-      if (isFromGroup) {
-        if (text.indexOf('@everyone') !== -1) {
-          const participantsJids = (await conn.groupMetadata(chat.jid)).participants.map((p) => p.jid) ?? [];
-          await conn.sendMessage(chat.jid, '.', MessageType.extendedText, {
-            quoted: message,
-            contextInfo: {
-              mentionedJid: participantsJids,
-            },
-          });
-          return;
-        }
+      const resolver = getResolverWithoutPrefix(text.replace(/ +/g, ' '));
+      return sendMessageFromResolver(resolver)
+      // if (isFromGroup) {
+      //   let matches = text.match(/@[A-Za-z]+[\w-]+/g);
+      //   if (matches && matches.length) {
+      //     const sendMessage = await sendRoleMention(matches, chat.jid, chat.jid);
+      //     if (!sendMessage) return;
+      //     sendMessage.options && (sendMessage.options.quoted = message);
+      //     await conn.sendMessage(sendMessage.destinationId, sendMessage.message, sendMessage.type, sendMessage.options);
+      //     return;
+      //   }
+      // }
+      // const askForHelp = text.match(/help|tolong|bantu/);
 
-        let matches = text.match(/@[A-Za-z]+[\w-]+/g);
-        if (matches && matches.length) {
-          const sendMessage = await sendRoleMention(matches, chat.jid, chat.jid);
-          if (!sendMessage) return;
-          sendMessage.options && (sendMessage.options.quoted = message);
-          await conn.sendMessage(sendMessage.destinationId, sendMessage.message, sendMessage.type, sendMessage.options);
-          return;
-        }
-      }
-      const askForHelp = text.match(/help|tolong|bantu/);
-
-      if (askForHelp && (!isFromGroup || message.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(conn.user.jid))) {
-        const sendMessage = await helpReply(askForHelp)(message, chat.jid);
-        conn.sendMessage(sendMessage.destinationId, sendMessage.message, sendMessage.type, sendMessage.options);
-      }
-      return;
+      // if (askForHelp && (!isFromGroup || message.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(conn.user.jid))) {
+      //   const sendMessage = await helpReply(askForHelp)(message, chat.jid);
+      //   conn.sendMessage(sendMessage.destinationId, sendMessage.message, sendMessage.type, sendMessage.options);
+      // }
+      // return;
     }
 
     if (process.env.IS_DEVELOPMENT !== 'false' && !developerNumbers.includes(message.participant)) {
@@ -73,12 +63,11 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
       return;
     }
 
-    const regex = `^${prefix}$`;
     // if there's no command specified
-    if (text.match(regex)) {
+    if (text.match(`^${escapeRegExp((prefix as string))}$`)) {
       conn.sendMessage(
         chat.jid,
-        `Halo, ${isGroupID(chat.jid) ? `@${message.participant.split('@')[0]}` : 'ada apa ?'}`,
+        `Halo, ${isFromGroup ? `@${message.participant.split('@')[0]}` : 'ada apa ?'}`,
         MessageType.extendedText,
         {
           contextInfo: {
@@ -90,12 +79,19 @@ export const handler = (conn: WAConnection, chat: WAChatUpdate) => {
     }
 
 
-    const regexPre = new RegExp(`^ *${prefix} *`);
-    const resolver = getResolver(text.replace(regexPre, '').replace(/ +/, ' '));
+    const regexPre = new RegExp(`^ *${escapeRegExp(prefix as string)} *`);
+    const resolver = getResolver(text.replace(regexPre, '').replace(/ +/g, ' '));
+    return sendMessageFromResolver(resolver);
 
-    const sendMessage: ResolverResult = await resolver(message, chat.jid);
+    async function sendMessageFromResolver(resolver: ResolverFunction) {
+      if (!resolver) return;
 
-    if (!sendMessage || !sendMessage.destinationId || !sendMessage.message || !sendMessage.type) return;
-    conn.sendMessage(sendMessage.destinationId, sendMessage.message, sendMessage.type, sendMessage.options);
+      const sendMessage: ResolverResult = await resolver(message, chat.jid, isFromGroup);
+
+      if (!sendMessage || !sendMessage.destinationId || !sendMessage.message || !sendMessage.type) return;
+      conn.sendMessage(sendMessage.destinationId, sendMessage.message, sendMessage.type, sendMessage.options);
+    };
   });
 };
+
+

@@ -13,7 +13,6 @@ const PrefixSchema = new mongoose.Schema<Prefix>({
     jid: {
         type: String,
         required: true,
-        index: "text",
         unique: true,
     },
 });
